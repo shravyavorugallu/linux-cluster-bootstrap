@@ -1,0 +1,36 @@
+---
+- name: Set hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}.{{ domain }}"
+
+- name: Install baseline packages
+  ansible.builtin.dnf:
+    name: [vim, curl, wget, git, htop, sysstat, net-tools,
+           bind-utils, nfs-utils, chrony, rsyslog, tuned]
+    state: present
+    update_cache: true
+
+- name: Configure chrony NTP
+  ansible.builtin.template:
+    src: chrony.conf.j2
+    dest: /etc/chrony.conf
+    mode: '0644'
+  notify: restart chrony
+
+- name: Apply sysctl tuning
+  ansible.posix.sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    sysctl_set: true
+    reload: true
+  loop: "{{ sysctl_settings }}"
+
+- name: Set tuned throughput profile
+  ansible.builtin.command: tuned-adm profile throughput-performance
+  changed_when: true
+
+- name: Ensure rsyslog running
+  ansible.builtin.systemd:
+    name: rsyslog
+    state: started
+    enabled: true

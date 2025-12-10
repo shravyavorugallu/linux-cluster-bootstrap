@@ -1,0 +1,31 @@
+---
+cluster_name: hpc-cluster-01
+domain: cluster.internal
+
+ntp_servers:
+  - 0.rhel.pool.ntp.org
+  - 1.rhel.pool.ntp.org
+
+nfs_server: 10.0.0.5
+nfs_mounts:
+  - { src: "{{ nfs_server }}:/home",    mount: /home,    opts: "rw,sync,hard" }
+  - { src: "{{ nfs_server }}:/scratch", mount: /scratch, opts: "rw,sync,hard,noatime" }
+  - { src: "{{ nfs_server }}:/apps",    mount: /apps,    opts: "ro,sync,hard" }
+
+ldap_uri: ldap://ldap.cluster.internal
+ldap_base_dn: dc=cluster,dc=internal
+ldap_bind_dn: cn=readonly,dc=cluster,dc=internal
+
+node_exporter_version: "1.7.0"
+node_exporter_port: 9100
+
+ssh_permit_root: "no"
+ssh_password_auth: "no"
+ssh_max_auth_tries: 3
+ssh_allowed_groups: "wheel cluster-users"
+
+sysctl_settings:
+  - { key: vm.swappiness,                  value: 10 }
+  - { key: net.core.somaxconn,             value: 65535 }
+  - { key: net.ipv4.tcp_max_syn_backlog,   value: 65535 }
+  - { key: fs.file-max,                    value: 2097152 }
