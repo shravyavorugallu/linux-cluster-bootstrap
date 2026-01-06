@@ -1,0 +1,12 @@
+[sssd]
+services = nss, pam
+domains = {{ domain }}
+
+[domain/{{ domain }}]
+id_provider   = ldap
+auth_provider = ldap
+ldap_uri          = {{ ldap_uri }}
+ldap_search_base  = {{ ldap_base_dn }}
+ldap_default_bind_dn = {{ ldap_bind_dn }}
+cache_credentials = true
+enumerate = false

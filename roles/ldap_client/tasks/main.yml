@@ -1,0 +1,23 @@
+---
+- name: Install SSSD packages
+  ansible.builtin.dnf:
+    name: [sssd, sssd-ldap, oddjob-mkhomedir, authselect]
+    state: present
+
+- name: Configure SSSD
+  ansible.builtin.template:
+    src: sssd.conf.j2
+    dest: /etc/sssd/sssd.conf
+    mode: '0600'
+  notify: restart sssd
+
+- name: Enable authselect with mkhomedir
+  ansible.builtin.command: authselect select sssd with-mkhomedir --force
+  changed_when: true
+
+- name: Enable sssd and oddjobd
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+  loop: [sssd, oddjobd]
