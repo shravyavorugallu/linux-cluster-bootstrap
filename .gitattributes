@@ -1,0 +1,4 @@
+# Tell GitHub Linguist that Jinja templates are supporting files,
+# not the primary language of this Ansible repo
+*.j2      linguist-detectable=false
+*.j2      linguist-documentation=true
